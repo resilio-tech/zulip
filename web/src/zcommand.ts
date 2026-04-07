@@ -3,6 +3,7 @@ import * as z from "zod/mini";
 
 import * as channel from "./channel.ts";
 import * as compose_banner from "./compose_banner.ts";
+import * as compose_ui from "./compose_ui.ts";
 import * as feedback_widget from "./feedback_widget.ts";
 import {$t} from "./i18n.ts";
 import * as markdown from "./markdown.ts";
@@ -128,6 +129,17 @@ export function process(message_content: string): boolean {
                 tell_user(msg);
             },
         });
+        return true;
+    }
+
+    if (content === "/bug") {
+        const template =
+            "# Bug Report\n\nPlease change the responsible person accordingly: @**Gaiëtan Renault**  \n\n**Complete only if it is relevant:**\n## User Affected: \n<user affected , its group, role>\n\n## Description: \n<small description of what's happening>\n\n## Expected Behaviour: \n<what should happen>\n\n## Operating System: \n<Win/OSX/Linux>\n\n## Timestamp: \n<when bug happened>\n\n## Remarks:\n\n## Logs, video and screenshots:";
+        setTimeout(() => {
+            const $textarea = $("textarea#compose-textarea");
+            $textarea.val(template);
+            compose_ui.autosize_textarea($textarea);
+        }, 0);
         return true;
     }
 
