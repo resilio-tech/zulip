@@ -1,0 +1,85 @@
+name: Build and publish Zulip Docker image
+
+# Builds a production Zulip container image from this fork and publishes it
+# to GHCR (ghcr.io/resilio-tech/zulip). Uses the official zulip/docker-zulip
+# Dockerfile and overrides its ZULIP_GIT_URL / ZULIP_GIT_REF build args to
+# point at this repository, so we inherit upstream packaging fixes for free.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (branch, tag, or full SHA) of resilio-tech/zulip to build from. Defaults to the ref this workflow was dispatched on."
+        required: false
+        type: string
+
+concurrency:
+  group: build-docker-image-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  FORK_URL: https://github.com/${{ github.repository }}.git
+  DOCKER_ZULIP_REF: main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Resolve source ref
+        id: src
+        run: |
+          INPUT_REF="${{ github.event.inputs.ref }}"
+          if [ -n "$INPUT_REF" ]; then
+            echo "ref=$INPUT_REF" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out zulip/docker-zulip (upstream packaging)
+        uses: actions/checkout@v4
+        with:
+          repository: zulip/docker-zulip
+          ref: ${{ env.DOCKER_ZULIP_REF }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image tags and labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=sha,format=short
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            ZULIP_GIT_URL=${{ env.FORK_URL }}
+            ZULIP_GIT_REF=${{ steps.src.outputs.ref }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
