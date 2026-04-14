@@ -134,7 +134,7 @@ export function process(message_content: string): boolean {
 
     if (content === "/bug") {
         const template =
-            "# Bug Report\n\nPlease change the responsible person accordingly: @**Gaiëtan Renault**  \n\n**Complete only if it is relevant:**\n## User Affected: \n<user affected , its group, role>\n\n## Description: \n<small description of what's happening>\n\n## Expected Behaviour: \n<what should happen>\n\n## Operating System: \n<Win/OSX/Linux>\n\n## Timestamp: \n<when bug happened>\n\n## Remarks:\n\n## Logs, video and screenshots:";
+            "# Bug Report\n\nPlease change the responsible person accordingly: @**Gaiëtan Renault**  \n\n**Complete only if it is relevant:**\n## Description\nA clear and concise description of what the bug or need is.\n\n### (If bug) Steps to reproduce\n1. Click on '....'\n2. Scroll down to '....'\n3. See error\n\n## Where\nSpecify (link :exclamation:) which page the bug/need is.\n\n## User Affected\n<user affected, its group, role>\n\n## Required permissions\nSpecify what kind of access is needed to reproduce the bug (specific account, admin access, regular access...).\n\n## Expected Behaviour / Solution\nA clear and concise description of what you expected to happen.\n\n## Operating System\n<Win/OSX/Linux>\n\n## Timestamp\n<when bug happened>\n\n## Additional context / Remarks\nAdd any other context about the problem here.\n\n## Logs, video and screenshots\nIf applicable, add screenshots to help explain your problem.";
         setTimeout(() => {
             const $textarea = $("textarea#compose-textarea");
             $textarea.val(template);
