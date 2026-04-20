@@ -3,6 +3,7 @@ import * as z from "zod/mini";
 
 import * as channel from "./channel.ts";
 import * as compose_banner from "./compose_banner.ts";
+import * as compose_ui from "./compose_ui.ts";
 import * as feedback_widget from "./feedback_widget.ts";
 import {$t} from "./i18n.ts";
 import * as markdown from "./markdown.ts";
@@ -128,6 +129,17 @@ export function process(message_content: string): boolean {
                 tell_user(msg);
             },
         });
+        return true;
+    }
+
+    if (content === "/bug") {
+        const template =
+            "# Bug Report\n\nPlease change the responsible person accordingly: @**Gaiëtan Renault**  \n\n**Complete only if it is relevant:**\n## Description\nA clear and concise description of what the bug or need is.\n\n### (If bug) Steps to reproduce\n1. Click on '....'\n2. Scroll down to '....'\n3. See error\n\n## Where\nSpecify (link :exclamation:) which page the bug/need is.\n\n## User Affected\n<user affected, its group, role>\n\n## Required permissions\nSpecify what kind of access is needed to reproduce the bug (specific account, admin access, regular access...).\n\n## Expected Behaviour / Solution\nA clear and concise description of what you expected to happen.\n\n## Operating System\n<Win/OSX/Linux>\n\n## Timestamp\n<when bug happened>\n\n## Additional context / Remarks\nAdd any other context about the problem here.\n\n## Logs, video and screenshots\nIf applicable, add screenshots to help explain your problem.";
+        setTimeout(() => {
+            const $textarea = $("textarea#compose-textarea");
+            $textarea.val(template);
+            compose_ui.autosize_textarea($textarea);
+        }, 0);
         return true;
     }
 

@@ -562,6 +562,12 @@ export const dev_only_slash_commands = [
 
 export const slash_commands = [
     {
+        text: $t({defaultMessage: "/bug"}),
+        name: "bug",
+        aliases: "",
+        info: $t({defaultMessage: "Report a bug"}),
+    },
+    {
         text: $t({defaultMessage: "/me"}),
         name: "me",
         aliases: "",

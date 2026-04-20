@@ -247,6 +247,13 @@ const emojis_by_name = new Map(
     }),
 );
 
+const bug_command = {
+    name: "bug",
+    aliases: "",
+    text: "translated: /bug",
+    info: "translated: Report a bug",
+};
+
 const me_command = {
     name: "me",
     aliases: "",
@@ -2557,6 +2564,7 @@ test("typeahead_results", ({override}) => {
     ]);
 
     // Autocomplete by slash commands.
+    assert_slash_matches("bug", [bug_command]);
     assert_slash_matches("me", [me_command]);
     assert_slash_matches("dark", [dark_command]);
     assert_slash_matches("night", [dark_command]);
